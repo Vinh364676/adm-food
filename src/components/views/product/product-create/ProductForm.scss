@@ -1,0 +1,56 @@
+.form__product {
+    &__card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+        .ant-card-head {
+            border-bottom: none;
+            &-title {
+                color: #1d1f2c;
+                font-size: 18px;
+                font-style: normal;
+                font-weight: 600;
+                padding: 20px 0;
+            }
+        }
+        .ant-card-body {
+            padding: 0 24px;
+        }
+        .ant-form-item{
+            &-required{
+                height: 100% !important;
+            }
+            &-label{
+                padding-bottom: 12px;
+                
+            }
+        }
+        &__input{
+            height: 46px;
+            border-radius: 10px;
+            padding-left: 15px;
+            &--area{
+                height: 150px !important;
+            }
+        }
+        &__select{
+            .ant-select-selector{
+                height: 56px !important;
+                border-radius: 10px !important;
+                display: flex;
+                align-items: center;
+            }
+        }
+        &__upload{
+            .ant-upload{
+                border-radius: 10px;
+                width: 100%;
+                &-drag-container{
+                    padding: 40px;
+                }
+            }
+          
+        }
+    }
+}

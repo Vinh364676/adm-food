@@ -1,0 +1,36 @@
+.layout{
+    &__header{
+      
+      background: #fff;
+      &--row{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      &--search{
+        display: flex;
+        align-items: center;
+        width: 578px;
+        &--input{
+          width: 100%;
+          border-radius: 8px;
+        }
+        .ant-input-prefix{
+          padding-right: 5px;
+        }
+      }
+      &--icon{
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+      &__buttonCustom{
+        padding: 0;
+        border: none;
+      }
+    }
+    &__content{
+      margin: 0 !important;
+    }
+    
+  }

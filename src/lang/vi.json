@@ -1,0 +1,21 @@
+{
+    "Router": {
+        "Home": "Trang chủ",
+        "SignIn": "Đăng nhập",
+        "SignUp": "Đăng ký",
+        "brand":"Thương hiệu",
+        "product":"Sản phẩm",
+        "create":"Tạo mới",
+        "edit":"Chỉnh sửa",
+        "order":"Đơn hàng",
+        "category":"Danh mục",
+        "receipt":"Hóa đơn",
+        "supplier": "Nhà cung cấp",
+        "accessory":"Phụ kiện",
+        "customer":"Khách hàng",
+        "user":"Tài khoản",
+        "voucher":"Khuyến mãi"
+    }
+
+   
+  }

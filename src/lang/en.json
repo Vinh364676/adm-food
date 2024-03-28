@@ -1,0 +1,30 @@
+{
+    "Router": {
+        "Home": "Trang chủ",
+        "SignIn": "Đăng nhập",
+        "SignUp": "Đăng ký",
+        "ForgotPassword": "Quên mật khẩu",
+        "Profile": "Hồ sơ",
+        "Order": "Đơn hàng",
+        "CreateOrder": "Tạo đơn hàng",
+        "User": "Người dùng",
+        "CreateUser": "Tạo người dùng",
+        "Product": "Sản phẩm",
+        "CreateProduct": "Tạo sản phẩm",
+        "EditProduct": "Chỉnh sửa sản phẩm",
+        "ForgotPassword": "Quên mật khẩu",
+        "Profile": "Hồ sơ",
+        "Order": "Đơn hàng",
+        "CreateOrder": "Tạo đơn hàng",
+        "User": "Người dùng",
+        "CreateUser": "Tạo người dùng",
+        "Product": "Sản phẩm",
+        "CreateProduct": "Tạo sản phẩm",
+        "EditProduct": "Chỉnh sửa sản phẩm",
+        "Receipt": "Hóa đơn",
+        "CreateReceipt":"Tạo mới hóa đơn",
+        "Customer": "Khách hàng"
+    }
+
+   
+  }

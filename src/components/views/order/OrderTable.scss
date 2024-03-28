@@ -1,0 +1,110 @@
+.buttonDelete {
+    display: flex;
+    // flex-direction: row-reverse;
+    align-items: center;
+    gap: 10px;
+}
+.order {
+    padding-top: 40px;
+    .order__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 15px 15px 0 0;
+        width: 100%;
+        height: 64px;
+        background: #fff;
+        padding: 0 20px;
+        &__right {
+            display: flex;
+            gap: 8px;
+            &--button {
+                display: flex;
+                flex-direction: row-reverse;
+                align-items: center;
+                .button__item {
+                    margin-left: 8px;
+                    height: 42px;
+                    border-radius: 12px;
+                }
+            }
+        }
+        &__search {
+            border: none;
+
+            border-bottom: 1px solid #ccc;
+            border-radius: 0;
+            .ant-input-prefix {
+                margin-right: 10px;
+            }
+        }
+    }
+    .order__table {
+        .ant-table {
+            padding: 0 20px;
+            border-radius: 0 0 15px 15px;
+        }
+        .ant-table-thead {
+            border-radius: 12px;
+            .ant-table-cell {
+                color: #94a3b8;
+                text-align: center;
+            }
+        }
+        .ant-table-tbody {
+            .ant-table-cell {
+                text-align: center;
+            }
+        }
+    }
+}
+// .customIcon {
+//     // display: flex;
+//     // flex-direction: row;
+//     // align-items: center;
+//     // gap: 8px;
+//     // background: rgba(233, 239, 253, 1);
+//     // max-width: 100px;
+//     // border-radius: 10px;
+//     // height: 30px;
+//     // color: #2563eb;
+// }
+
+// .circle {
+//     margin-left: 8px;
+//     width: 8px; /* Đặt chiều rộng */
+//     height: 8px; /* Đặt chiều cao */
+//     background-color: #007bff; /* Đặt màu nền */
+//     border-radius: 50%; /* Làm cho phần tử tròn */
+
+//     vertical-align: middle;
+// }
+.ant-pagination-item {
+    
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    a{
+
+        color: #94A3B8;
+    }
+    &-active{
+        a{
+
+            color: #007bff;
+        } 
+    }
+    &-link{
+        border-radius: 12px !important;
+    border: 1px solid #e2e8f0;
+    }
+}
+.select__order{
+    width: 200px !important;
+    height: 56px;
+    border-radius: 10px;
+    .ant-select-selector{
+        height: 56px !important;
+        align-items: center;
+        border-radius: 10px !important;
+    }
+}

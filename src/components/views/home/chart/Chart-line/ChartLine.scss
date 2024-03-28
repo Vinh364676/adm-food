@@ -1,0 +1,17 @@
+.chart__line {
+    background: #fff;
+    border-radius: 12px;
+    // padding: 24px;
+    padding-right:24px ;
+    &__title {
+        padding: 24px;
+        color: #0F172A;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 160%;
+    }
+}
+.recharts-cartesian-axis-tick-line{
+    stroke: none;
+}

@@ -1,0 +1,18 @@
+.account{
+    margin: 50px;
+
+    &__form{
+        display: flex;
+        flex-direction: column;
+        text-align: start;
+        margin: 0 auto;
+        .ant-form-item-label{
+            width: 150px;
+            text-align: left;
+        }
+        .form__input{
+            height: 42px;
+            border-radius: 10px;
+        }
+    }
+}

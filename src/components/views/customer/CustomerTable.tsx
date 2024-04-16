@@ -5,147 +5,116 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import deleteIcon from "../../../assets/images/product/deleteIcon.svg";
-import { Dropdown, Menu, Modal, Switch, notification } from "antd";
+import { Dropdown, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../constants/url-config";
-import { dispatch, useSelector } from "../../../redux/store";
-import { deleteBrand, deleteMultiple, getBrand } from "../../../redux/slices/brand";
-import moment from "moment";
-import { getProduct } from "../../../redux/slices/product";
-import { getCustomer } from "../../../redux/slices/customer";
-
+import axios from "axios";
+import LoadingComponent from "../../loading/loadingComponent";
+interface Items {
+  id: number;
+  fullName: string;
+  email: string;
+  phone: string;
+}
 const CustomerTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { customerList,customerCount } = useSelector((state) => state.customer);
-  console.log('====================================');
-  console.log("customerList",customerList);
-  console.log('====================================');
-  const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
-  console.log(selectedBrandId);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [loading,setLoading] = useState(true);
+  const [items, setItems] = useState<Items[]>([]);
   useEffect(() => {
-    dispatch(
-      getCustomer({
-        pageIndex: 1,
-        pageSize: 10,
+    fetch("https://viviepi-food-app-api.onrender.com/user/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
       })
-    );
+      .then((data) => {
+        setItems(data.data);
+      })
+      .catch((error) => {
+        // Xử lý lỗi bằng cách cập nhật state error
+      });
   }, []);
-  const showNotification = () => {
-    notification.success({
-      className: "notification__item",
-      message: "Xóa thành công",
-      //   description: 'Sản phẩm đã được xóa thành công!',
-      duration: 3,
-    });
+  const deleteAPI = async (selectedId: any) => {
+    try {
+      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/categories/api/delete?id=${selectedId}`);
+      setLoading(false);
+      return response.data;
+     
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error('Error deleting category:', error);
+      throw error;
+    }
   };
-  const showBrandHasProductsError = () => {
-    notification.error({
-      className: "notification__item notification__item--error",
-      message: "Thương hiệu đang tồn tại sản phẩm, không thể xóa được!",
-      //   description: 'Sản phẩm đã được xóa thành công!',
-      duration: 3,
-    });
-    setIsModalOpen(false);
-  };
-  const showModal = (brandID: number) => {
-    setSelectedBrandId(brandID);
+  const showModal = (id: number) => {
+    setSelectedId(id);
     setIsModalOpen(true);
   };
 
   const handleOk = async () => {
-    if (selectedBrandId !== null) {
-      await dispatch(deleteBrand(selectedBrandId));
-          setSelectedBrandId(null);
-          setIsModalOpen(false);
-          showNotification();
+    if (selectedId !== null) {
+      try {
+        await deleteAPI(selectedId);
+        // await dispatch(deleteSupplier(selectedId));
+        setSelectedId(null);
+        setIsModalOpen(false);
+        showNotification();
+      } catch (error) {
+        console.error("erorr:", error);
+      }
     }
   };
 
-  const onDeleteSelected = async (selectedItem: number[]) => {
-    // const selectedIds = [];
-    // for (const item of dataForTable) {
-    //   if (selectedItem.includes(item.key)) {
-    //     selectedIds.push(item.brandID);
-    //   }
-    // }
-
-    // try {
-    //   if (selectedIds.length > 0) {
-    //     await dispatch(deleteMultiple(selectedIds));
-    //     showNotification();
-    //   }
-    // } catch (error) {
-    //   // Xử lý lỗi ở đây nếu cần thiết
-    // }
-  };
-
-  const onChangePage = (pageIndex: any, pageSize: any) => {
-    dispatch(getCustomer({ PageNumber: pageIndex, PageSize: pageSize }));
-  };
-  const ExportExcel = () =>{}
-  const ImportExcel = () => {
-
-  }
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const dataForTable = customerList.map((customer, index) => ({
-    key: index,
-    id: customer.id,
-    name: customer.fullName,
-    gender: customer.gender === 0 ? 'Nam' : 'Nữ',
-    email:customer.email,
-    phone:customer.phoneNumber,
-    date:moment(customer.dateOfBirth).format("DD-MM-YYYY")
-    // dateCreate: moment(brand.createdDT).format("DD-MM-YYYY")
-  }));
+
+  //thong bao
+  const showNotification = () => {
+    notification.success({
+      className: "notification__item",
+      message: "Xóa thành công",
+      duration: 3,
+    });
+  };
+  const onChangePage = () => {
+    // dispatch(getSupplier({ PageNumber: pageIndex, PageSize: pageSize }));
+  };
+
+  const onDeleteSelectedProducts = async () => {};
+
+  const ExportExcel = () => {};
+  const importExcel = () => {};
+
+  const dataForTable = items.map((item, index) => {
+    return {
+      key: index,
+      id: item.id,
+      name: item.fullName,
+      email: item.email,
+
+    };
+  });
   const columns = [
     {
-      title: "ID",
+      title: "Id",
       dataIndex: "id",
-      width: 150,
+      width: 50,
     },
     {
-      title: "Họ và tên",
+      title: "Tên khách hàng",
       dataIndex: "name",
-      width: 300,
+      width: 200,
     },
     {
-      title: "Ngày sinh",
-      dataIndex: "date",
-      width: 300,
+      title: "Email liên hệ",
+      dataIndex: "email",
+      width: 200,
     },
-    {
-      title: "Giới tính",
-      dataIndex: "gender",
-      width: 300,
-    },
-    {
-        title: "Email",
-        dataIndex: "email",
-        width: 300,
-      },
-      {
-        title: "Điện thoại",
-        dataIndex: "phone",
-        width: 300,
-      },
-    // {
-    //   title: "Trạng thái",
-    //   dataIndex: "status",
-    //   render: (text: any, record: any) => (
-    //     <span>
-    //       {text === "Published" ? (
-    //         <span className="status__publish">{text}</span>
-    //       ) : null}
-    //       {text === "Low Stock" ? (
-    //         <span className="status__low">{text}</span>
-    //       ) : null}
-    //     </span>
-    //   ),
-    //   width: 150,
-    // },
     {
       title: "Thao tác",
       dataIndex: "action",
@@ -155,16 +124,21 @@ const CustomerTable = () => {
             placement="bottomRight"
             menu={{
               items: [
-                // {
-                //   label: "Xóa",
-                //   key: "0",
-                //   icon: <DeleteOutlined />,
-                //   className: "drop--delete",
-                //   onClick: () => showModal(record.brandID),
-                // },
+                {
+                  label: "Xóa",
+                  key: "0",
+                  icon: <DeleteOutlined />,
+                  className: "drop--delete",
+                  onClick: () => showModal(record.id),
+                },
                 {
                   label: (
-                    <Link to={ROUTE_PATHS.EditCustomer.replace(":id", record.id.toString())}>
+                    <Link
+                      to={ROUTE_PATHS.EditVoucher.replace(
+                        ":id",
+                        record.id.toString()
+                      )}
+                    >
                       Sửa
                     </Link>
                   ),
@@ -182,23 +156,23 @@ const CustomerTable = () => {
           </Dropdown>
         </span>
       ),
-      width: 100,
+      width: 150,
     },
   ];
 
   return (
     <>
-      <TableComponent
+      {loading?<LoadingComponent/>: <TableComponent
         columns={columns}
         data={dataForTable}
         placeholder="Tìm kiếm khách hàng"
-        totalPage={customerCount}
-        onDeleteCheckBox={onDeleteSelected}
+        totalPage={1}
+        onDeleteCheckBox={onDeleteSelectedProducts}
         onChangePage={onChangePage}
         exportOnClick={ExportExcel}
-        importOnClick={ImportExcel}
-
-      />
+        importOnClick={importExcel}
+      />}
+     
       <Modal
         centered
         open={isModalOpen}

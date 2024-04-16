@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import deleteIcon from "../../../assets/images/product/deleteIcon.svg";
 import { Dropdown, Modal, notification } from "antd";
+import "./Product.scss"
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../constants/url-config";
@@ -35,7 +36,6 @@ const ProductTable = () => {
         return response.json();
       })
       .then((data) => {
-        // Cập nhật state categories với dữ liệu từ API
         setItems(data.data);
       })
       .catch((error) => {

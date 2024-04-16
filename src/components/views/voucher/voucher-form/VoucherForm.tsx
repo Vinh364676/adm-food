@@ -124,7 +124,6 @@ const selectedVoucherData = selected
       className="form__product"
         name="basic"
         onFinish={onFinish}
-        // onFinishFailed={onFinishFailed}
         autoComplete="off"
         initialValues={initialFormValues}
       >

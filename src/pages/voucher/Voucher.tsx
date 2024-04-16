@@ -11,7 +11,7 @@ interface Props extends RouteChildrenProps, LayoutProps { }
 export default function VoucherPage(props: Props) {
   return (
     <h1 className="homepage" >
-        <TitleComponent title="Danh sách tài khoản" to={ROUTE_PATHS.CreateVoucher}/>
+        <TitleComponent title="Danh sách khuyến mãi" to={ROUTE_PATHS.CreateVoucher}/>
         <VoucherTable/>
     </h1>
   )

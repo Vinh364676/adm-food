@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import "./loading.scss"
 import { BehaviorSubject } from "rxjs"
-
+import Lottie from 'lottie-react';
 // handle loading
 const loadingSubject = new BehaviorSubject<boolean>(false)
 
@@ -37,9 +37,9 @@ const Loading = () => {
 	//#endregion Subscribe Loading
 
 	return isLoading ? (
-		<div className="loading-section">
-			<div className="overlay-background"></div>
-			<div className="loader"></div>
+		<div style={{width:"100%", display:"flex", justifyContent:"center", alignItems:"center", height:"100vh", margin:"auto 0", background:"#fff"}}>
+			
+			<Lottie  animationData={require('../../../assets/loading/loading.json')} style={{width:"200px",height:"100%", display:"flex", justifyContent:"center", margin:"auto 0", alignItems:"center"}}/>
 		</div>
 	) : null
 }

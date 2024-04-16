@@ -121,6 +121,36 @@ const CategoryForm = ({ isEdit = false, selected }: Prop) => {
           // defaultValue={initialValue}
         />
       </Form.Item>
+      <Form.Item
+        name="name"
+        rules={[
+          {
+            required: true,
+            message: "Vui lòng nhập tên thương hiệu!",
+          },
+        ]}
+      >
+        <Input
+          placeholder="Tên danh mục"
+          className="category__form__input"
+          // defaultValue={initialValue}
+        />
+      </Form.Item>
+      <Form.Item
+        name="name"
+        rules={[
+          {
+            required: true,
+            message: "Vui lòng nhập tên thương hiệu!",
+          },
+        ]}
+      >
+        <Input
+          placeholder="Tên danh mục"
+          className="category__form__input"
+          // defaultValue={initialValue}
+        />
+      </Form.Item>
       <Form.Item className="category__form__buttonGroup">
         <Button
           type="primary"

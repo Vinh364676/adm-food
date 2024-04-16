@@ -8,5 +8,6 @@ export type CategoryState = {
 export type Category = {
     id: number;
     name: string;
-    createdDT:string;
+    status:string;
+    bannerUrl:string;
 };

@@ -41,19 +41,14 @@ export const getCategory = createAsyncThunk(
       return data;
     }
   );
-  export const deleteMultipleCategory = createAsyncThunk(
-    'delete/deleteMultiple',
-    async (id: number[]) => {
-      await categoryService.deleteAll(id);
-      return id;
-    }
-  );
+
   const initialState: CategoryState = {
     categoryList: [],
     categoryDetail:{
       id: 0,
       name: "",
-      createdDT:""
+      bannerUrl:"",
+      status:""
     },
     categoryCount:0
   };
@@ -63,8 +58,8 @@ export const getCategory = createAsyncThunk(
     reducers: {},
     extraReducers: (builder) => {
       builder.addCase(getCategory.fulfilled, (state, action) => {
-          state.categoryList = action.payload.result.items;
-          state.categoryCount = action.payload.result.totalCount;
+          state.categoryList = action.payload.data;
+          // state.categoryCount = action.payload.result.totalCount;
         });
       builder.addCase(deleteCategory.fulfilled, (state, action) => {
           state.categoryList = state.categoryList.filter((category) => category.id !== action.payload);
@@ -80,10 +75,7 @@ export const getCategory = createAsyncThunk(
           category.id === action.payload.id ? action.payload : category
           );
         });
-        builder.addCase(deleteMultipleCategory.fulfilled, (state, action) => {
-          const deletedIds = action.payload;
-          state.categoryList = state.categoryList.filter((category) => !deletedIds.includes(category.id));
-        });
+      
     },
   });
   export default slice.reducer;

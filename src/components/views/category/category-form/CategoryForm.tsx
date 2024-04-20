@@ -1,173 +1,220 @@
-import { Button, Form, Input, message, notification } from "antd";
-import { Link, useHistory, useParams } from "react-router-dom";
-import ButtonCustom from "../../../button-custom/ButtonCustom";
-import { ROUTE_PATHS } from "../../../../constants/url-config";
-import { dispatch, useDispatch, useSelector } from "../../../../redux/store";
-import { useEffect, useState } from "react";
-import "./CategoryForm.scss";
 import {
-  createCategory,
-  getCategory,
-  updateCategory,
-} from "../../../../redux/slices/category";
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  Row,
+  Select,
+  Upload,
+  notification,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { ROUTE_PATHS } from "../../../../constants/url-config";
+import ButtonFeat from "../../../button-feat/ButtonFeat";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import LoadingComponent from "../../../loading/loadingComponent";
 type Prop = {
   isEdit?: boolean;
   selected?: { id: string } | null;
 };
+interface Items {
+  id: number;
+  name: string;
+  status: string;
+  bannerUrl: string;
+}
 const CategoryForm = ({ isEdit = false, selected }: Prop) => {
-  const { categoryList } = useSelector((state) => state.category);
+  const [form] = Form.useForm();
+  const [thumnail, setThumnail] = useState<any | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<Items[]>([]);
   useEffect(() => {
-    dispatch(
-      getCategory({
-        pageIndex: 1,
-        pageSize: 100,
+    fetch("https://viviepi-food-app-api.onrender.com/categories/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        return response.json();
       })
-    );
+      .then((data) => {
+        setItems(data.data);
+      })
+      .catch(() => {});
   }, []);
-  const selectedCategory = selected
-  ? categoryList.find((category) => category.id === parseInt(selected.id))
-  : undefined;
-  console.log(selectedCategory);
+  //thong bao
+  const showNotification = () => {
+    notification.success({
+      className: "notification__item",
+      message: "Tạo thành công",
+      duration: 3,
+    });
+  };
+  const handleTest = () => {};
+  const selectData = selected
+    ? items.find((product) => product.id === parseInt(selected.id))
+    : undefined;
+  console.log("====================================");
+  console.log(selectData);
+  console.log("====================================");
+  const onFinish = (formData: any) => {
+    setLoading(true);
+    const url = "https://viviepi-food-app-api.onrender.com/categories/api";
 
-  const onFinish = (values: any) => {
-    const { name } = values;
+    if (isEdit && selectData) {
+      const formDataUpdate = new FormData();
+      // Assuming you have a productId in selectData
+      formDataUpdate.append("id", selectData.id.toString());
+      formDataUpdate.append("ProductName", formData.productName);
+      formDataUpdate.append("Price", formData.price);
+      formDataUpdate.append("Quantity", formData.quantity);
+      formDataUpdate.append("BrandId", formData.brand);
+      formDataUpdate.append("Size", formData.size);
+      formDataUpdate.append("Color", formData.color);
+      formDataUpdate.append("Description", formData.description);
+      formDataUpdate.append("Code", formData.code);
+      formDataUpdate.append("Gender", formData.gender);
+      formDataUpdate.append("Status", formData.status);
+      formDataUpdate.append("CategoryId", formData.category);
+      formDataUpdate.append("thumNail", thumnail);
 
-    if (isEdit && selected) {
-      if (
-        categoryList.some(
-          (category) => category.name === name && category.id !== parseInt(selected.id, 10)
-        )
-      ) {
-        notification.error({
-          className: "notification__item notification__item--error",
-          message: "Tên danh mục đã tồn tại",
-          duration: 3,
+      axios
+        .put(`${url}/Update`, formDataUpdate)
+        .then((response) => {
+          console.log(response.data);
+          showNotification();
+        })
+        .catch((error) => {
+          console.error(error);
         });
-      } else {
-        dispatch(updateCategory({ id: selected.id, name: values.name }))
-          .unwrap()
-          .then((response) => {
-            notification.success({
-              className: "notification__item",
-              message: "Cập nhật thành công",
-              duration: 3,
-            });
-            setTimeout(function () {
-              window.location.href = "/category";
-            }, 3000);
-          })
-          .catch((error) => {
-            console.error("Error updating brand:", error);
-            notification.error({
-              className: "notification__item",
-              message: "Lỗi1",
-              duration: 3,
-            });
-          });
-      }
-    } else if (!isEdit) {
-      if (categoryList.some((category) => category.name === name)) {
-        // Kiểm tra xem tên thương hiệu đã tồn tại khi tạo mới
-        notification.error({
-          className: "notification__item notification__item--error",
-          message: "Tên danh mục đã tồn tại",
-          duration: 3,
+    } else {
+      const formDataSubmit = new FormData();
+      const status ="1";
+      formDataSubmit.append("name", formData.name);
+      formDataSubmit.append("categoryCode", formData.categoryCode);
+      formDataSubmit.append("status", status);
+      formDataSubmit.append("file", thumnail);
+      axios
+        .post(`${url}/insert`, formDataSubmit)
+        .then((response) => {
+          console.log(response.data);
+          showNotification();
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
         });
-      } else {
-        dispatch(createCategory(values))
-          .unwrap()
-          .then((response) => {
-            notification.success({
-              className: "notification__item",
-              message: "Tạo thành công",
-              duration: 3,
-            });
-            setTimeout(function () {
-              window.location.href = "/category";
-            }, 3000);
-          })
-          .catch((error) => {
-            console.error("Error creating category:", error);
-            notification.error({
-              className: "notification__item",
-              message: "Lỗi2",
-              duration: 3,
-            });
-          });
-      }
     }
   };
+
   return (
-    <Form
-      className="category__form"
-      name="basic"
-      onFinish={onFinish}
-      // onFinishFailed={onFinishFailed}
-      autoComplete="off"
-      initialValues={isEdit ? selectedCategory : {}}
-    >
-      <Form.Item
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: "Vui lòng nhập tên thương hiệu!",
-          },
-        ]}
+    <>
+      {loading && <LoadingComponent />}
+      <Form
+        form={form}
+        name="basic"
+        requiredMark={"optional"}
+        initialValues={isEdit ? selectData : {}}
+        labelCol={{
+          span: 24,
+        }}
+        wrapperCol={{
+          span: 24,
+        }}
+        onFinish={onFinish}
+        autoComplete="off"
+        className="form__product"
       >
-        <Input
-          placeholder="Tên danh mục"
-          className="category__form__input"
-          // defaultValue={initialValue}
-        />
-      </Form.Item>
-      <Form.Item
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: "Vui lòng nhập tên thương hiệu!",
-          },
-        ]}
-      >
-        <Input
-          placeholder="Tên danh mục"
-          className="category__form__input"
-          // defaultValue={initialValue}
-        />
-      </Form.Item>
-      <Form.Item
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: "Vui lòng nhập tên thương hiệu!",
-          },
-        ]}
-      >
-        <Input
-          placeholder="Tên danh mục"
-          className="category__form__input"
-          // defaultValue={initialValue}
-        />
-      </Form.Item>
-      <Form.Item className="category__form__buttonGroup">
-        <Button
-          type="primary"
-          htmlType="button"
-          className="category__form__buttonGroup__button category__form__buttonGroup__button--cancel"
-        >
-          <Link to={ROUTE_PATHS.Category}>Quay lại</Link>
-        </Button>
-        <Button
-          type="primary"
-          htmlType="submit"
-          className="category__form__buttonGroup__button "
-        >
-          Tạo mới
-        </Button>
-      </Form.Item>
-    </Form>
+        <Card title="Thông tin danh mục" className="form__product__card">
+          <Row gutter={[20, 0]}>
+            <Col span={12}>
+              <Form.Item
+                label="Tên danh mục"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập tên danh mục!",
+                  },
+                  {
+                    validator: (_, value) => {
+                      if (/^[0-9!@#$%^&*(),.?":{}|<>]/.test(value)) {
+                        return Promise.reject(
+                          "Tên danh mục không được bắt đầu bằng số hoặc ký tự đặc biệt!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Tên danh mục"
+                  className="form__product__card__input"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Mã danh mục"
+                name="categoryCode"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng nhập mã danh mục!",
+                  },
+                ]}
+              >
+                <Input
+                  placeholder="Mã danh mục"
+                  className="form__product__card__input"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[20, 0]}>
+            <Col span={12}>
+              <Form.Item
+                label="file"
+                name="thumbnail"
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng tải lên thumbnail.",
+                  },
+                ]}
+                initialValue={isEdit && thumnail ? [thumnail] : []}
+              >
+                <Upload
+                  accept=".png,.jpg,.pdf"
+                  maxCount={1}
+                  beforeUpload={(file) => {
+                    setThumnail(file);
+                    return false;
+                  }}
+                >
+                  <Button
+                    className="form-profile__upload form__product__card__input"
+                    size="large"
+                  >
+                    Tải lên
+                    <UploadOutlined />
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+        <Form.Item className="brand__form__buttonGroup">
+          <ButtonFeat
+            link={ROUTE_PATHS.Category}
+            onCreateNew={handleTest}
+            handleName={isEdit ? "Lưu" : "Tạo mới"}
+          />
+        </Form.Item>
+      </Form>
+    </>
   );
 };
 export default CategoryForm;

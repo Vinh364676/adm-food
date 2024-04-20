@@ -1,242 +1,223 @@
 import TableComponent from "../../tableComponent/TableComponent";
 import {
   EllipsisOutlined,
-  DeleteOutlined,
-  DownloadOutlined,
-  FilterOutlined,
-  CheckCircleOutlined,
-  EditOutlined,
+  EyeOutlined
 } from "@ant-design/icons";
-import productImg from "../../../assets/images/product/product.svg";
-import productImg1 from "../../../assets/images/product/product1.jpg";
-import deleteIcon from "../../../assets/images/product/deleteIcon.svg";
-import { Dropdown, Input, Menu, Modal, Select, notification } from "antd";
+import { Dropdown, Modal, Select, notification } from "antd";
 import { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import { ROUTE_PATHS } from "../../../constants/url-config";
-import { dispatch, useSelector } from "../../../redux/store";
-import { deleteBrand, getBrand } from "../../../redux/slices/brand";
-import moment from "moment";
-import "./OrderTable.scss";
-import {
-  deleteMultiple,
-  deleteProduct,
-  getProduct,
-  getProductPage,
-} from "../../../redux/slices/product";
-import { getCategory } from "../../../redux/slices/category";
 import axios from "axios";
-import { write } from "xlsx";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { deleteSupplier, getSupplier } from "../../../redux/slices/supplier";
-import { getHistory, updateHistory } from "../../../redux/slices/history";
-import { getHistoryDetail } from "../../../redux/slices/historyDetail";
-const { Item, Divider } = Menu;
-
+import LoadingComponent from "../../loading/loadingComponent";
+import moment from "moment";
+interface Items {
+  id: string;
+  userId: string;
+  name:string;
+  phone:string
+  deliveryAddress: string;
+  description: string;
+  date: string;
+  totalPrice:string;
+  status:string;
+}
+interface ItemsUser {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
+interface ItemsDetail {
+  id: string;
+  foodId: string;
+  quantity: string;
+  billId: string;
+}
+interface ItemsProduct {
+  id: number;
+  name: string;
+}
 const OrderTable = () => {
-  const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { historyList, historyCount } = useSelector((state) => state.history);
-  console.log("====================================");
-  console.log("historyList", historyList);
-  console.log("====================================");
-  const { historyDetailList } = useSelector((state) => state.historyDetail);
-  const { productList } = useSelector((state) => state.product);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
-  console.log("uploadedFile-prodct", uploadedFile);
+  const [loading,setLoading] = useState(true);
+  const [items, setItems] = useState<Items[]>([]);
+  const [itemsUser, setItemsUser] = useState<ItemsUser[]>([]);
+  const [details, setDetails] = useState<ItemsDetail[]>([]);
+  const [products, setProducts] = useState<ItemsProduct[]>([]);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  console.log('====================================');
+  console.log("details",details);
+  console.log('====================================');
   useEffect(() => {
-    dispatch(getHistory({ PageNumber: 1, PageSize: 10 }));
-    dispatch(getHistoryDetail({ PageNumber: 1, PageSize: 100 }));
-    dispatch(getProduct({ PageNumber: 1, PageSize: 100 }));
+    fetch("https://viviepi-food-app-api.onrender.com/bill/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
+      })
+      .then((data) => {
+        setItems(data.data);
+      })
+      .catch((error) => {
+      
+      });
   }, []);
-  //xu ly
-  // modal
+  useEffect(() => {
+    fetch("https://viviepi-food-app-api.onrender.com/user/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
+      })
+      .then((data) => {
+        setItemsUser(data.data);
+      })
+      .catch((error) => {
+      
+      });
+  }, []);
+  useEffect(() => {
+    fetch("https://viviepi-food-app-api.onrender.com/bill-detail/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
+      })
+      .then((data) => {
+        setDetails(data.data);
+      })
+      .catch((error) => {
+      
+      });
+  }, []);
+  useEffect(() => {
+    fetch("https://viviepi-food-app-api.onrender.com/food/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
+      })
+      .then((data) => {
+        setProducts(data.data);
+      })
+      .catch((error) => {
+      
+      });
+  }, []);
+  const updateAPI = async (selectedId: any, data: any) => {
+    try {
+      const response = await axios.put(`https://viviepi-food-app-api.onrender.com/bill/api/update/${selectedId}`, data);
+      setLoading(false);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating bill:', error);
+      throw error;
+    }
+  };
   const showModal = (id: number) => {
     setSelectedId(id);
     setIsModalOpen(true);
-   console.log('====================================');
-   console.log("key",id);
-   console.log('====================================');
   };
-  const handleSelectChange = (value:any) => {
-    // Xử lý sự kiện khi giá trị của Select thay đổi
-    setSelectedStatus(value);
-  };
-  
-  const handleOk = async () => {
-    if (selectedStatus !== null && selectedId !== null) {
-      // Tìm mục trong orderHistory có ID trùng khớp với selectedId
-      const selectedItem = orderHistory.find((item) => item.id === selectedId);
 
-      if (selectedItem) {
-        // Chuẩn bị dữ liệu cần gửi đến API cho mục được chọn
-        const dataToSend = {
-          id: selectedItem.id,
-          deliverAddress: selectedItem.address,
-          createDate: moment(selectedItem.date, 'DD-MM-YYYY').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-          totalPrice: 0,
-          userId: selectedItem.userId,
-          voucherId: selectedItem.voucherId,
-          orderStatus: selectedStatus,
-          note: '',
+  const handleOk = async () => {
+    if (selectedId !== null && selectedStatus !== null) {
+      try {
+        const data = {
+          status: selectedStatus
         };
   
-        try {
-          // Gửi dữ liệu đến API
-          await dispatch(updateHistory(dataToSend));
-          // Sau khi API thành công, bạn có thể thực hiện các bước tiếp theo nếu cần
-          console.log('Data sent to API successfully');
-          setIsModalOpen(false);
-          showNotification();
-        } catch (error) {
-          console.error('Error updating history:', error);
-        }
-      } else {
-        console.error(`Item with ID ${selectedId} not found in orderHistory`);
+        await updateAPI(selectedId, data); // Truyền cả selectedId và data
+        setSelectedId(null);
+        setIsModalOpen(false);
+        showNotification();
+      } catch (error) {
+        console.error("error:", error);
       }
     }
   };
   
-  
+
   const handleCancel = () => {
     setIsModalOpen(false);
+  };  
+  const handleSelectChange = (value:any) => {
+    // Xử lý sự kiện khi giá trị của Select thay đổi
+    setSelectedStatus(value);
   };
 
   //thong bao
   const showNotification = () => {
     notification.success({
       className: "notification__item",
-      message: "Cập nhật thành công",
-      //   description: 'Sản phẩm đã được xóa thành công!',
+      message: "Xóa thành công",
       duration: 3,
     });
   };
-  const showNotificationExport = () => {
-    notification.success({
-      className: "notification__item",
-
-      message: "Xuất file Excel thành công",
-      //   description: 'Sản phẩm đã được xóa thành công!',
-      duration: 3,
-    });
-  };
-  const showNotificationImport = () => {
-    notification.success({
-      className: "notification__item",
-
-      message: "Nhập file Excel thành công",
-      //   description: 'Sản phẩm đã được xóa thành công!',
-      duration: 3,
-    });
-  };
-  // xu ly thay doi page
   const onChangePage = (pageIndex: any, pageSize: any) => {
-    dispatch(getHistory({ PageNumber: pageIndex, PageSize: pageSize }));
-  };
-  // xu ly xoa nhieu san pham
-  const onDeleteSelectedProducts = async (selectedProductIds: number[]) => {
-    // const selectedIds = [];
-    // for (const product of dataForTable) {
-    //   if (selectedProductIds.includes(product.key)) {
-    //     selectedIds.push(product.id);
-    //   }
-    // }
-    // try {
-    //   if (selectedIds.length > 0) {
-    //     await dispatch(deleteMultiple(selectedIds));
-    //     showNotification();
-    //   }
-    // } catch (error) {
-    //   // Xử lý lỗi ở đây nếu cần thiết
-    // }
+    // dispatch(getSupplier({ PageNumber: pageIndex, PageSize: pageSize }));
   };
 
-  // export excel
-  const ExportExcel = () => {
-    axios
-      .get("https://localhost:7199/api/OrderAdmin/ExportExcel", {
-        responseType: "arraybuffer",
-      })
-      .then((response) => {
-        const blob = new Blob([response.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        saveAs(blob, "Orders.xlsx");
-        showNotificationExport();
-      })
-      .catch((error) => {
-        console.error("Error when calling API to export Excel:", error);
-      });
-  };
-  // import excel
-  const importExcel = (file: any) => {
-    // setUploadedFile(file); // Lưu file đã tải lên vào state
-    // if (file) {
-    //   // Kiểm tra xem file có tồn tại
-    //   const formData = new FormData();
-    //   formData.append("file", file);
-    //   console.log("formData", formData);
-    //   // Make a POST request to the API endpoint
-    //   axios
-    //     .post("https://localhost:7199/api/Product/ImportExcel", formData)
-    //     .then((response) => {
-    //       // Handle the response from the API if needed
-    //       showNotificationImport();
-    //       console.log("File uploaded successfully", response);
-    //       setTimeout(() => {
-    //         window.location.reload();
-    //       }, 3000); // Thời gian chờ 3 giây (3000 milliseconds
-    //     })
-    //     .catch((error) => {
-    //       // Handle any errors that occur during the API request
-    //       console.error("Error uploading file", error);
-    //     });
-    // }
+  const onDeleteSelectedProducts = async () => {};
+
+  const ExportExcel = () => {};
+  const importExcel = () => {};
+  const getFullNameByUserId = (userId: string): string => {
+    const user = itemsUser.find((user) => user.id === userId);
+    return user ? user.fullName : '';
   };
 
-  const orderHistory = historyList.map((historyItem) => {
-    const formattedTotal = new Intl.NumberFormat("vi-VN", {
+  const dataForTable = items.map((item, index) => {
+    const date = moment(item.date).format("HH:mm:ss DD-MM-YYYY");
+    const value = (+item.totalPrice).toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(historyItem.totalPrice);
-
-    // Filter historyDetailList to get details for the current historyItem
-    const historyDetailsForItem = historyDetailList.filter(
-      (detail) => detail.billId === historyItem.id
-    );
-
-    const productDetails = historyDetailsForItem.map((detail) => {
-      const product = productList.find(
-        (product) => product.id === detail.productId
-      );
-      const productName = product ? product.productName : "Unknown Product";
-      return {
-        productName: productName,
-        quantity: detail.quantity,
-        price: detail.unitPrice,
-      };
     });
-    // Extract product names, quantities, and prices from productDetails
-    const productNames = productDetails.map((product) => product.productName);
-    const quantities = productDetails.map((product) => product.quantity);
-    const prices = productDetails.map((product) => product.price);
+    const statusMap = {
+      0: "Chờ xác nhận",
+      1: "Đang giao hàng",
+      2: "Hoàn thành"
+    };
+  
+    // Kiểm tra nếu thuộc tính 'status' là một số
+    const statusText = typeof item.status === 'number' ? statusMap[item.status] : item.status;
+    const fullName = getFullNameByUserId(item.userId);
+    const billDetails = details.filter(detail => detail.billId === item.id);
+    let foodIds: string[] = [];
+    let quantities: number[] = []; // Mảng lưu trữ quantities tương ứng với foodIds
+    
+    billDetails.forEach(detail => {
+      foodIds.push(detail.foodId);
+      quantities.push(parseInt(detail.quantity)); // Thêm quantity vào mảng quantities
+    });
+    const foodNames = foodIds.map(foodId => {
+      const product = products.find(product => product.id === parseInt(foodId));
+      return product ? product.name : 'Unknown'; // Nếu không tìm thấy sản phẩm, trả về 'Unknown'
+    });
 
     return {
-      id: historyItem.id,
-      voucherId: historyItem.voucherId,
-      address: historyItem.deliverAddress,
-      userId: historyItem.userId,
-      idProduct: historyDetailsForItem.map((detail) => detail.productId),
-      date: moment(historyItem.createDate).format("DD/MM/YYYY"),
-      total: formattedTotal,
-      status: historyItem.orderStatus,
-      quantity: quantities,
-      prices: prices,
+      key: index,
+      id: item.id,
+      name: fullName,
+      userId: item.userId,
+      value: value,
+      phone:item.phone,
+      date:date,
+      address:item.deliveryAddress,
+      desc: item.description,
+      status:statusText,
+      foodIds: foodIds.join(', '),
+      foodNames:foodNames.join(', '),
+      totalQuantity:quantities.join(', '),
+      demo : foodNames.map((foodName, index) => `${foodName} [${quantities[index]}]`).join(',')
 
-      name: productNames.join(", "), // Concatenate product names
+
     };
   });
   const columns = [
@@ -246,38 +227,39 @@ const OrderTable = () => {
       width: 50,
     },
     {
-      title: "Mã Khách hàng",
-      dataIndex: "userId",
-      width: 300,
+      title: "Tên khách hàng",
+      dataIndex: "name",
+      width: 200,
+    },
+    {
+      title: "Sản phẩm",
+      dataIndex: "demo",
+      width: 200,
+      render: (text:any, record:any) => (
+        <span dangerouslySetInnerHTML={{
+          __html: record.demo.split(',').join('<br><br>')
+        }} />
+      ),
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "desc",
+      width: 200,
     },
     {
       title: "Địa chỉ",
       dataIndex: "address",
-      width: 150,
+      width: 200,
     },
     {
-      title: "Sản phẩm",
-      dataIndex: "name",
-      width: 150,
+      title: "Thời gian",
+      dataIndex: "date",
+      width: 200,
     },
+   
     {
-      title: "Số lượng",
-      dataIndex: "quantity",
-      width: 150,
-    },
-    {
-      title: "Giá",
-      dataIndex: "prices",
-      width: 150,
-    },
-    {
-      title: "Khuyến mãi",
-      dataIndex: "voucherId",
-      width: 150,
-    },
-    {
-      title: "Tổng cộng",
-      dataIndex: "total",
+      title: "Giá trị",
+      dataIndex: "value",
       width: 150,
     },
     {
@@ -297,19 +279,10 @@ const OrderTable = () => {
                 {
                   label: "Xem",
                   key: "0",
-                  icon: <DeleteOutlined />,
-                  // className: "drop--delete",
+                  icon: <EyeOutlined />,
                   onClick: () => showModal(record.id),
                 },
-                // {
-                //   label: (
-                //     <Link to={ROUTE_PATHS.EditSupplier.replace(":id", record.id.toString())}>
-                //       Sửa
-                //     </Link>
-                //   ),
-                //   key: "1",
-                //   icon: <EditOutlined />,
-                // },
+              
               ],
             }}
             className="table__action__dropdown"
@@ -327,17 +300,16 @@ const OrderTable = () => {
 
   return (
     <>
-      <TableComponent
+      {loading?<LoadingComponent/>: <TableComponent
         columns={columns}
-        data={orderHistory}
+        data={dataForTable}
         placeholder="Tìm kiếm đơn hàng"
-        totalPage={historyCount}
+        totalPage={1}
         onDeleteCheckBox={onDeleteSelectedProducts}
         onChangePage={onChangePage}
         exportOnClick={ExportExcel}
         importOnClick={importExcel}
-        isPrimary={false}
-      />
+      />}
       <Modal
         centered
         open={isModalOpen}
@@ -350,16 +322,15 @@ const OrderTable = () => {
           <h2 className="modal__product__content--title">
             Thay đổi trạng thái
           </h2>
-
           <Select
             placeholder="Trạng thái"
-            className="select__order"
+            className="select__order form__product__card__select"
             onChange={handleSelectChange}
           value={selectedStatus}
           >
-            <Select.Option value="Đang xử lý">Đang xử lý</Select.Option>
-            <Select.Option value="Đã gửi hàng">Đã gửi hàng</Select.Option>
-            <Select.Option value="Đã giao hàng">Đã giao hàng</Select.Option>
+            <Select.Option value="0">Chờ Xác nhận</Select.Option>
+            <Select.Option value="1">Giao hàng</Select.Option>
+            <Select.Option value="2">Hoàn thành</Select.Option>
           </Select>
         </div>
       </Modal>

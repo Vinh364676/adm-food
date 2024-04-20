@@ -39,12 +39,12 @@ const ProductTable = () => {
         setItems(data.data);
       })
       .catch((error) => {
-        // Xử lý lỗi bằng cách cập nhật state error
+      
       });
   }, []);
   const deleteAPI = async (selectedId: any) => {
     try {
-      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/categories/api/delete?id=${selectedId}`);
+      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/food/api/delete?id=${selectedId}`);
       setLoading(false);
       return response.data;
      

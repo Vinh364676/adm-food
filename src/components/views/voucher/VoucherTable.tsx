@@ -38,13 +38,13 @@ const VoucherTable = () => {
         // Cập nhật state categories với dữ liệu từ API
         setItems(data.data);
       })
-      .catch((error) => {
+      .catch(() => {
         // Xử lý lỗi bằng cách cập nhật state error
       });
   }, []);
   const deleteAPI = async (selectedId: any) => {
     try {
-      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/categories/api/delete?id=${selectedId}`);
+      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/voucher/api/delete/${selectedId}`);
       return response.data;
      
      
@@ -55,6 +55,7 @@ const VoucherTable = () => {
     }
   };
   const showModal = (id: number) => {
+
     setSelectedId(id);
     setIsModalOpen(true);
   };
@@ -63,7 +64,6 @@ const VoucherTable = () => {
     if (selectedId !== null) {
       try {
         await deleteAPI(selectedId);
-        // await dispatch(deleteSupplier(selectedId));
         setSelectedId(null);
         setIsModalOpen(false);
         showNotification();
@@ -85,8 +85,7 @@ const VoucherTable = () => {
       duration: 3,
     });
   };
-  const onChangePage = (pageIndex: any, pageSize: any) => {
-    // dispatch(getSupplier({ PageNumber: pageIndex, PageSize: pageSize }));
+  const onChangePage = () => {
   };
 
   const onDeleteSelectedProducts = async () => {};

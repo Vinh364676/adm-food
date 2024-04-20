@@ -291,9 +291,10 @@ const TableComponent = ({
           columns={columns}
           dataSource={filteredData}
           pagination={false}
-          // scroll={{
-          //   x: 1000
-          // }}
+        
+          scroll={{
+            x: 1000
+          }}
         />
         <div className="table__footer">
           <div className="table__footer__col">

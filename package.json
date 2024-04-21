@@ -2,6 +2,9 @@
   "name": "bba",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "14.17.3"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

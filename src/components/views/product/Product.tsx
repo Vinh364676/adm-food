@@ -13,7 +13,7 @@ import { ROUTE_PATHS } from "../../../constants/url-config";
 import axios from "axios";
 import LoadingComponent from "../../loading/loadingComponent";
 interface Items {
-  id: number;
+  id: string;
   name: string;
   categoryId: string;
   description: string;
@@ -21,11 +21,20 @@ interface Items {
   price: string;
   imgUrl:string;
 }
+interface ItemsCategory {
+  id: string;
+  name: string;
+  status: string;
+  bannerUrl: string;
+
+}
 const ProductTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [loading,setLoading] = useState(true);
   const [items, setItems] = useState<Items[]>([]);
+  
+  const [itemsCategory, setItemsCategory] = useState<ItemsCategory[]>([]);
   useEffect(() => {
     fetch("https://viviepi-food-app-api.onrender.com/food/api/get/all")
       .then((response) => {
@@ -42,9 +51,25 @@ const ProductTable = () => {
       
       });
   }, []);
+  useEffect(() => {
+    fetch("https://viviepi-food-app-api.onrender.com/categories/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Cập nhật state categories với dữ liệu từ API
+        setItemsCategory(data.data);
+      })
+      .catch((error) => {
+        // Xử lý lỗi bằng cách cập nhật state error
+      });
+  }, []);
   const deleteAPI = async (selectedId: any) => {
     try {
-      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/food/api/delete?id=${selectedId}`);
+      const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/food/api/delete/${selectedId}`);
       setLoading(false);
       return response.data;
      
@@ -63,7 +88,6 @@ const ProductTable = () => {
     if (selectedId !== null) {
       try {
         await deleteAPI(selectedId);
-        // await dispatch(deleteSupplier(selectedId));
         setSelectedId(null);
         setIsModalOpen(false);
         showNotification();
@@ -93,17 +117,22 @@ const ProductTable = () => {
 
   const ExportExcel = () => {};
   const importExcel = () => {};
+  const getFullNameByCategory = (userId: string): string => {
+    const user = itemsCategory.find((item) => item.id === userId);
+    return user ? user.name : '';
+  };
 
   const dataForTable = items.map((item, index) => {
     const value = (+item.price).toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
     });
+    const fullName = getFullNameByCategory(item.categoryId);
     return {
       key: index,
       id: item.id,
       name: item.name,
-      category: item.categoryId,
+      category: fullName,
       value: value,
       imgUrl: item.imgUrl,
       desc: item.description,
@@ -162,7 +191,7 @@ const ProductTable = () => {
                 {
                   label: (
                     <Link
-                      to={ROUTE_PATHS.EditVoucher.replace(
+                      to={ROUTE_PATHS.EditProduct.replace(
                         ":id",
                         record.id.toString()
                       )}

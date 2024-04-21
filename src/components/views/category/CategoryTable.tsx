@@ -9,20 +9,24 @@ import { Dropdown, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTE_PATHS } from "../../../constants/url-config";
-import moment from "moment";
 import axios from "axios";
+import LoadingComponent from "../../loading/loadingComponent";
 interface Items {
-  id: number;
+  id: string;
   name: string;
   status: string;
   bannerUrl: string;
-
+}
+interface ItemsProduct {
+  categoryId: number;
 }
 const CategoryTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
+  const [loading,setLoading] = useState(false);
   const [items, setItems] = useState<Items[]>([]);
+  const [itemProducts, setItemProducts] = useState<ItemsProduct[]>([]);
+  
   useEffect(() => {
     fetch("https://viviepi-food-app-api.onrender.com/categories/api/get/all")
       .then((response) => {
@@ -39,12 +43,26 @@ const CategoryTable = () => {
         // Xử lý lỗi bằng cách cập nhật state error
       });
   }, []);
+  useEffect(() => {
+    fetch("https://viviepi-food-app-api.onrender.com/food/api/get/all")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Lỗi kết nối mạng hoặc phản hồi không thành công");
+        }
+        setLoading(false);
+        return response.json();
+      })
+      .then((data) => {
+        setItemProducts(data.data);
+      })
+      .catch((error) => {
+      
+      });
+  }, []);
   const deleteAPI = async (selectedId: any) => {
     try {
       const response = await axios.delete(`https://viviepi-food-app-api.onrender.com/categories/api/delete?id=${selectedId}`);
-      return response.data;
-     
-     
+      return response.data;     
     } catch (error) {
       // Xử lý lỗi nếu có
       console.error('Error deleting category:', error);
@@ -57,15 +75,25 @@ const CategoryTable = () => {
   };
 
   const handleOk = async () => {
+    setLoading(true)
     if (selectedId !== null) {
       try {
-        await deleteAPI(selectedId);
-        // await dispatch(deleteSupplier(selectedId));
-        setSelectedId(null);
-        setIsModalOpen(false);
-        showNotification();
+        const hasProducts = itemProducts.some(
+          (product) => product.categoryId === selectedId
+        );
+        if (hasProducts) {
+          showError();
+          setLoading(false)
+        } else {
+      
+          await deleteAPI(selectedId);
+          setSelectedId(null);
+          setIsModalOpen(false);
+          showNotification();
+          setLoading(false)
+        }
       } catch (error) {
-        console.error("erorr:", error);
+        console.error("Error deleting brand:", error);
       }
     }
   };
@@ -82,6 +110,16 @@ const CategoryTable = () => {
       duration: 3,
     });
   };
+  const showError = () => {
+    notification.error({
+      className: "notification__item notification__item--error",
+      message: "Danh mục đang tồn tại sản phẩm, không thể xóa được!",
+      //   description: 'Sản phẩm đã được xóa thành công!',
+      duration: 3,
+    });
+    setIsModalOpen(false);
+  };
+
   const onChangePage = (pageIndex: any, pageSize: any) => {
     // dispatch(getSupplier({ PageNumber: pageIndex, PageSize: pageSize }));
   };
@@ -173,7 +211,7 @@ const CategoryTable = () => {
 
   return (
     <>
-      <TableComponent
+      {loading?<LoadingComponent/>: <TableComponent
         columns={columns}
         data={dataForTable}
         placeholder="Tìm kiếm danh mục"
@@ -182,7 +220,7 @@ const CategoryTable = () => {
         onChangePage={onChangePage}
         exportOnClick={ExportExcel}
         importOnClick={importExcel}
-      />
+      />}
       <Modal
         centered
         open={isModalOpen}

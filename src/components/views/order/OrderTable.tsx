@@ -156,7 +156,7 @@ const OrderTable = () => {
   const showNotification = () => {
     notification.success({
       className: "notification__item",
-      message: "Xóa thành công",
+      message: "Cập nhật thành công",
       duration: 3,
     });
   };

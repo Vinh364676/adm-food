@@ -270,6 +270,7 @@ const ProductForm = ({ isEdit = false, selected }: Prop) => {
             </Col>
           </Row>
         </Card>
+        
         <Form.Item className="brand__form__buttonGroup">
           <ButtonFeat
             link={ROUTE_PATHS.Product}

@@ -54,3 +54,48 @@
         }
     }
 }
+.brand__form{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 60%;
+    margin: 0 auto;
+    &__input{
+        height: 56px;
+        border-radius: 10px;
+        padding: 4px 20px;
+        &__date{
+            width: 200px;
+        }
+    }
+    &__buttonGroup{
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background: #fff;
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+        gap: 20px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        &__button{
+           
+            margin-left: 20px;
+            border-radius: 10px;
+            height: 42px;
+            transition: box-shadow 0.3s ease;
+            font-weight: 600;
+        &:hover {
+            box-shadow: 0 0 20px rgba(24, 144, 255, 0.5);
+        }
+            &--cancel{
+                background: none;
+                color: #1890ff;
+                &:hover{
+                    color: #1890ff;
+                    background:rgba(24, 144, 255, 0.1);
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+}

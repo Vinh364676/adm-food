@@ -174,7 +174,8 @@ const OrderTable = () => {
   };
 
   const dataForTable = items.map((item, index) => {
-    const date = moment(item.date).format("HH:mm:ss DD-MM-YYYY");
+    const date = moment(item.date).add(7, 'hours').format("HH:mm:ss DD-MM-YYYY");
+
     const value = (+item.totalPrice).toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",

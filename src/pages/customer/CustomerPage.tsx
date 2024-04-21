@@ -4,7 +4,6 @@ import BreadcrumbHeader from "../../components/breadcrumb/Breadcrumb";
 import TitleComponent from "../../components/titleComponent/Title";
 import OrderTable from "../../components/views/order/OrderTable";
 import { ROUTE_PATHS } from "../../constants/url-config";
-import BrandTable from "../../components/views/brand/BrandTable";
 import CustomerTable from "../../components/views/customer/CustomerTable";
 interface Props extends RouteChildrenProps, LayoutProps { }
 

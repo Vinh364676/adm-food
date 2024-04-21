@@ -1,11 +1,6 @@
 import { RouteChildrenProps, useParams } from "react-router";
 import TitleComponent from "../../../components/titleComponent/Title";
 import { LayoutProps } from "antd";
-import BrandForm from "../../../components/views/brand/brand-form/BrandForm";
-import { dispatch, useSelector } from "../../../redux/store";
-import { useEffect } from "react";
-import { getCategory } from "../../../redux/slices/category";
-import CategoryForm from "../../../components/views/category/category-form/CategoryForm";
 import CustomerForm from "../../../components/views/customer/customer-form/CustomerForm";
 
 interface Props extends RouteChildrenProps, LayoutProps { }

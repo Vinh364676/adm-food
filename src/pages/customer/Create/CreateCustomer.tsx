@@ -1,7 +1,6 @@
 import { RouteChildrenProps } from "react-router";
 import TitleComponent from "../../../components/titleComponent/Title";
 import { LayoutProps } from "antd";
-import BrandForm from "../../../components/views/brand/brand-form/BrandForm";
 import CustomerForm from "../../../components/views/customer/customer-form/CustomerForm";
 
 interface Props extends RouteChildrenProps, LayoutProps { }

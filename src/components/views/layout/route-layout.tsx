@@ -9,7 +9,6 @@ import AnonymousLayout from "./anonymous/anonymous";
 import MainLayout from './main/main';
 import Dashboard from "../../layout/Dashboard";
 import SignIn from "../../../pages/sign-in/sign-in";
-import ForgotPassword from "../../../pages/forgot-password/ForgotPassword";
 
 export interface LayoutProps {
   pageTitle: React.ReactNode;

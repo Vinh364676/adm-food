@@ -7,7 +7,6 @@ import "./sign-in.scss";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import banner from "../../assets/images/c.jpg";
 import { UserOutlined,LinkOutlined } from '@ant-design/icons';
-import accountService from "../../services/account/account.service";
 import LocalUtils from "../../utils/local";
 import { LOCAL_STORAGE_KEYS } from "../../constants/local";
 import { ROUTE_PATHS } from "../../constants/url-config";
@@ -17,54 +16,54 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuthContext();
   const onFinish = async (values: any) => {
-  try {
-    setLoading(true);
-    const loginData = {
-      username: values.username,
-      password: values.password,
-    };
+  // try {
+  //   setLoading(true);
+  //   const loginData = {
+  //     username: values.username,
+  //     password: values.password,
+  //   };
 
-    console.log("Before API call");
-    const response = await accountService.login(loginData);
-    console.log("After API call");
-    console.log(response); // Log the API response for debugging
+  //   console.log("Before API call");
+  //   const response = "";
+  //   console.log("After API call");
+  //   console.log(response); // Log the API response for debugging
 
-    if (response.status === 200) {
-      const token = response.data.token;
-      LocalUtils.set(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, token);
-      login(loginData.username, loginData.password);
-      notification.success({
-        className: "notification__item",
-        message: 'Đăng nhập thành công',
-        description: `Xin chào, ${loginData.username}!`,
-        duration: 3,
-      });
-      setTimeout(function() {
-        window.location.href = '/'; // Replace with the actual path to your home page
-      }, 3000);
-    } else if (response.status === 401) {
-      // Unauthorized - Incorrect email or password
-      notification.error({
-        message: 'Lỗi Đăng Nhập',
-        description: 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng thử lại sau.',
-      });
-    } else {
-      // Handle other error cases
-      notification.error({
-        message: 'Lỗi Đăng Nhập',
-        description: 'Đã xảy ra lỗi không xác định trong quá trình đăng nhập. Vui lòng thử lại sau.',
-      });
-    }
-  } catch (error) {
-    // Handle exceptions
-    console.error(error);
-    notification.error({
-      message: 'Lỗi',
-      description: 'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại sau.',
-    });
-  } finally {
-    setLoading(false);
-  }
+  //   if (response.status === 200) {
+  //     const token = response.data.token;
+  //     LocalUtils.set(LOCAL_STORAGE_KEYS.ACCESS_TOKEN, token);
+  //     login(loginData.username, loginData.password);
+  //     notification.success({
+  //       className: "notification__item",
+  //       message: 'Đăng nhập thành công',
+  //       description: `Xin chào, ${loginData.username}!`,
+  //       duration: 3,
+  //     });
+  //     setTimeout(function() {
+  //       window.location.href = '/'; // Replace with the actual path to your home page
+  //     }, 3000);
+  //   } else if (response.status === 401) {
+  //     // Unauthorized - Incorrect email or password
+  //     notification.error({
+  //       message: 'Lỗi Đăng Nhập',
+  //       description: 'Tên đăng nhập hoặc mật khẩu không chính xác. Vui lòng thử lại sau.',
+  //     });
+  //   } else {
+  //     // Handle other error cases
+  //     notification.error({
+  //       message: 'Lỗi Đăng Nhập',
+  //       description: 'Đã xảy ra lỗi không xác định trong quá trình đăng nhập. Vui lòng thử lại sau.',
+  //     });
+  //   }
+  // } catch (error) {
+  //   // Handle exceptions
+  //   console.error(error);
+  //   notification.error({
+  //     message: 'Lỗi',
+  //     description: 'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại sau.',
+  //   });
+  // } finally {
+  //   setLoading(false);
+  // }
 };
 
   return (
